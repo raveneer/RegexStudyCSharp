@@ -225,5 +225,29 @@ namespace Study
         }
 
         #endregion
+
+        #region 한정사 - 회수 조건
+        // * : 0 1 2...
+        // + : 1 2 3...
+        // ? : 0 1
+        // {1} : 1
+        // {1,} : 1 2 3...
+        // {1,3} : 1 2 3
+
+
+        [Test]
+        public void Check_Count()
+        {
+            Assert.AreEqual("123", Regex.Match("123", @"\d{1,2}3").Value);
+            Assert.AreEqual("12345", Regex.Match("12345", @"\d{1,}5").Value); //숫자를 1개이상 가지고, 5로 끝나는 것
+            Assert.AreEqual("12345", Regex.Match("12345", @"\d{1,4}5").Value);
+            Assert.AreEqual("45", Regex.Match("12345", @"\d{1}5").Value); // 숫자를 하나만 가지고, 5로 끝나는 것은 "45"
+            
+            Assert.AreEqual("12345", Regex.Match("12345 23456", @"\d*5").Value); // 숫자를 0개 이상 가지고, 5로 끝나는 것은
+            Assert.AreEqual(2, Regex.Matches("12345 23456", @"\d+5").Count); // 숫자를 1개 이상 가지고, 5로 끝나는 것은 12345, 2345 2가지 있다.
+            Assert.AreEqual(3, Regex.Matches("12345 23456 5", @"\d?5").Count); // 숫자를 0 또는 1개 가지는 것. 12345, 2345, 5 3가지 있다.
+        }
+
+        #endregion
     }
 }
