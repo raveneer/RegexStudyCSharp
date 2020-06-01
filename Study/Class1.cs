@@ -201,7 +201,9 @@ namespace Study
 
         #endregion
 
-        #region 한정사 - 회수 조건
+        #region 한정사 - 회수 조건.
+        //한정사를 씀으로서 여러개의 글자가 존재하는지 체크할 수 있다.
+        
         // * : 0 1 2...
         // + : 1 2 3...
         // ? : 0 1
@@ -223,6 +225,90 @@ namespace Study
             Assert.AreEqual(3, Regex.Matches("12345 23456 5", @"\d?5").Count); // 숫자를 0 또는 1개 가지는 것. 12345, 2345, 5 3가지 있다.
         }
 
+
+        [Test]
+        public void Lazy_한정사()
+        {
+            //뒤에 ? 붙이는 걸로 한정사가 첫번째 매치만 찾도록 할 수 있다.
+            
+            //A와 A 사이에 아무 문자라도 있거나 없거나 하면 됨. (탐욕적)
+            Assert.AreEqual("ABABA", Regex.Match("ABABA", @"A.*A").Value); 
+            
+            //A와 A 사이에 아무 문자라도 있거나 없거나 할 것. (게으른)
+            Assert.AreEqual("ABA", Regex.Match("ABABA", @"A.*?A").Value);
+
+            //위 경우는 당연히 여러개의 답이 존재하게 된다. 단, 겹치지는 않음에 주의할 것.
+            Assert.AreEqual(2, Regex.Matches("ABAABA", @"A.*?A").Count); // 이 경우 2개의 답이 되지만...
+            Assert.AreEqual(1, Regex.Matches("ABABA", @"A.*?A").Count); //이 경우 1개의 답이 되버린다. 중앙의 A가 겹치지 않기 때문에.
+
+        }
+        #endregion
+
+        #region ZeroWidth
+
+        //지금까지의 정규식들은 식을 이용해 특정 값을 체크했다.
+        //전방탐색, 후방탐색, 앵커, 단어경계를 이용하여 특정 값 이전과 이후의 조건을 체크하는 것이 가능하다.
+        //당연히 이것은 '조건' 이므로 정규식의 검색 결과에 포함되지 않는다. (포함되지 않는게 장점일때도 있을 것이다)
+        //예를 들어 숫자 뒤에 글자가 오는 경우의 패턴을 찿고 싶다면, '앞에 글자가 있다'는 것이 조건이며, 실제 찾는 것은 '글자' 인 것이다.
+
+        //(?=정규식) 으로 묶어줌으로서,전방탐색을 할 수 있다.
+        //(?!정규식) 으로 음성 전방탐색 (전방탐색의 조건과 반대)를 할 수 있다.
+        
+        //주의해야 할 것. (?i)는 '소문자 옵션' 이다. 상당히...헷갈리지.
+
+        [Test]
+        public void Test_LookAhead()
+        {
+            //miles가 뒤따라 오는 숫자를 구하기.
+            //(단 이 경우 예제의 명확함을 위해 /s가 앞에 나온것에 주의)
+            Assert.AreEqual("25 ", Regex.Match("say 25 miles more", @"\d+\s(?=miles)").Value);
+            //순수히 숫자만 구하겠다면...\s 를 안으로 집어넣어야 하는데, 이러면 꼭 smiles 처럼 보인단 말이지...
+            Assert.AreEqual("25", Regex.Match("say 25 miles more", @"\d+(?=\smiles)").Value);
+            //이렇게 조건을 만족하지 않는다면 검출되지 않는다. (mile 과 meter 는 다르니까)
+            Assert.AreEqual("", Regex.Match("say 25 meter more", @"\d+(?=\smiles)").Value);
+            //단지 조건일 뿐이므로, 이런 식으로 그 이후를 받아내는 것도 가능하다. (뒤에 .*를 넣어 끝까지 뽑아냈음) -> 관용구라 할 만 하네.
+            Assert.AreEqual("25 miles more", Regex.Match("say 25 miles more", @"\d+(?=\smiles).*").Value);
+
+            //강한 패스워드 규칙을 정할때 자주 쓰게 된다 (관용구)
+            //적어도 6자 여야 하며, 숫자가 적어도 하나는 있어야 한다고 하자.
+
+            //1. (?=) 로 조건을 지정했다. "숫자가 1개 이상 있을 것" 
+            //2. 그 조건을 만족했다면, 만족한 곳으로 돌아가서 "길이가 6이상인지 체크" 한다.
+            //todo : 이 예제에서 헷갈리는 것은 '만족한 곳으로 돌아간다' 인데. 그게 어딘지 정확히 모르겠다.
+            var regex = @"(?=.*\d).{6,}";  
+            Assert.AreEqual(true, Regex.IsMatch("abcde1", regex));
+            Assert.AreEqual(false, Regex.IsMatch("ABCD1", regex)); // 길이가 모자람
+            Assert.AreEqual(true, Regex.IsMatch("ABCDEF11", regex));//길이가 넘치는 건 괜찮음.
+            Assert.AreEqual(false, Regex.IsMatch("ABCDEF", regex));//숫자가 하나는 있어야 함
+            Assert.AreEqual(true, Regex.IsMatch("1234567", regex)); //숫자만으로 되어도 문제없다.
+
+            
+        }
+
+
+        [Test]
+        public void NegativeLookAhead()
+        {
+            //움성 전방탐색은 (?! 로 표시한다. ?= 와 ?! 의 쌍임)
+            //(?!)
+            //이후의 텍스트가 정규식과 부합하지 않아야 만족함.
+            //Q: good 을 가지되, 그 다음에 but 이나 however 가 없을 것
+            //대소문자 구분을 하지 않을 것.
+            var regex = @"(?i)good(?!.*(however|but))"; 
+            Assert.AreEqual(true, Regex.IsMatch("good", regex));
+            Assert.AreEqual(true, Regex.IsMatch("Good", regex));
+            Assert.AreEqual(false, Regex.IsMatch("good. but...", regex));
+            Assert.AreEqual(false, Regex.IsMatch("good. But...", regex));
+            Assert.AreEqual(false, Regex.IsMatch("good. and But...", regex));
+            Assert.AreEqual(false, Regex.IsMatch("good. however...", regex));
+            Assert.AreEqual(false, Regex.IsMatch("good. However...", regex));
+            Assert.AreEqual(false, Regex.IsMatch("good. and so However...", regex));
+
+            //Q : 그 역을 구하시오. good을 포함하되, 뒤에 but이나 however 가 따라와야 성립하도록 할 것. 대소문자 무시할 것.
+            var antiRegex = @"(?i)good(?=.*(but|however))";
+            Assert.AreEqual(false, Regex.IsMatch("good", antiRegex));
+            Assert.AreEqual(true, Regex.IsMatch("good. but...", antiRegex));
+        }
         #endregion
     }
 }
