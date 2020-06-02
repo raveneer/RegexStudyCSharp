@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using System.Threading;
 using NUnit.Framework;
 
 /// <summary>
@@ -255,6 +256,7 @@ namespace Study
         //(?!정규식) 으로 음성 전방탐색 (전방탐색의 조건과 반대)를 할 수 있다.
         
         //주의해야 할 것. (?i)는 '소문자 옵션' 이다. 상당히...헷갈리지.
+        //어쨌든 () 안에 오는게 '정규식' 임에 유의할 것.
 
         [Test]
         public void Test_LookAhead()
@@ -309,6 +311,67 @@ namespace Study
             Assert.AreEqual(false, Regex.IsMatch("good", antiRegex));
             Assert.AreEqual(true, Regex.IsMatch("good. but...", antiRegex));
         }
+
+
+        [Test]
+        public void NegativeLookBehind()
+        {
+            //(?<=정규식)
+            //양성 후방탐색
+            //부합위치 이전의 텍스트가 정규식과 부합해야 함. 
+            var regex = @"(?i)(?<=however.*)good"; //대소문자 무시하고, however 가 앞에 있어야 한다.
+            Assert.AreEqual(false, Regex.IsMatch("very good", regex));
+            Assert.AreEqual(true, Regex.IsMatch("However good", regex));
+            Assert.AreEqual(true, Regex.IsMatch("However and good", regex));
+        }
+
+        [Test]
+        public void PositiveLookBehind()
+        {
+            //(?<!정규식)
+            //음성 후방탐색
+            //부합위치 이전의 텍스트사 정규식과 부합하지 않아야 함.
+            var regex = @"(?i)(?<!however.*)good"; //대소문자 무시하고, however 가 앞에 없어야 함. however 뒤에 .*는 그 사이에 글자가 몇개 있을 수도 있다는 것.
+            Assert.AreEqual(true,  Regex.IsMatch("very good", regex)); 
+            Assert.AreEqual(false,  Regex.IsMatch("However good", regex));
+            Assert.AreEqual(false,  Regex.IsMatch("However and good", regex)); //however 뒤에 .*이 붙었으므로, good 과 however 사이에 무엇이 있든 상관없음.
+
+        }
+        #endregion
+
+        #region Anchor
+
+        //^와 $ 로 앵커를 세팅할 수 있다. 이들은 문자가 아니라 특정 '위치'에 부합한다. 
+        //^ : 문자열의 시작을 의미. 멀티라인에서는 한행의 시작과 부합. (여러개가 될 수도 있겠네?)
+        //$ : 문자열의 끝을 의미. 멀티라인에서는 한행의 끝과 부합.
+        [Test]
+        public void Anchor_MeansPlace_NotWord()
+        {
+            //위치만 지정하고 글자 자체는 받아내지 못한다... 그럼 이거 왜 쓰는거야?
+            Assert.AreEqual("", Regex.Match("a", @"^").Value);
+            Assert.AreEqual("", Regex.Match("a", @"$").Value);
+
+            //이래도 빈칸임. 즉 위치정보만 가지고 값 정보는 없다고 볼 수 있다. (애매하네용)000
+            Assert.AreEqual("", Regex.Match("aa", @"^").Value);
+            Assert.AreEqual("", Regex.Match("aa", @"$").Value);
+        }
+
+        [Test]
+        public void ByWord()
+        {
+            var regex = @"\b\w+\b";
+            Assert.AreEqual(3, Regex.Matches("aa bb cc", regex).Count);
+            Assert.AreEqual(3, Regex.Matches("aa bbb cc", regex).Count);
+            Assert.AreEqual(4, Regex.Matches("aa bb1 ccc 1", regex).Count);
+
+            //단어단위로 끊지 않으므로, 2개 선택됨 (in, in)
+            Assert.AreEqual(2, Regex.Matches("in inout", @"in").Count);
+            //단어단위로 끊으니까 앞의 in 만 선택됨
+            Assert.AreEqual(1, Regex.Matches("in inout", @"\bin\b").Count);
+            Assert.AreEqual("in", Regex.Match("in inout", @"\bin\b").Value);
+
+        }
+
         #endregion
     }
 }
