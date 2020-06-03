@@ -1,25 +1,155 @@
-﻿using System.Text.RegularExpressions;
-using System.Threading;
+﻿using System.Linq;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 
-/// <summary>
-/// C#의 정규식은 @버바팀을 씀으로서 /? 등을 ?로 퉁칠 수 있어 편하다...
-/// 
-/// </summary>
 namespace Study
 {
-    public class Class1
+    public class 한정사
     {
         [Test]
-        public void FirstStep_UseQuestionMark_OneOrZeroCharacterMatch()
+        public void u가0또는1있기()
         {
-            //아래 모든 경우를 만족하는 정규식을 쓰시오.
-            Assert.IsTrue(Regex.IsMatch("color", @"colou?r")); //u? 에서 u는 있어도 좋고 없어도 좋고이다. 단 1회만.
-            Assert.IsTrue(Regex.IsMatch("colour", @"colou?r")); // 없는 경우.
-            Assert.IsFalse(Regex.IsMatch("colouur", @"colou?r")); // 있지만 2개 있어서 실패!
+            var pattern = @"colou?r";
+            Assert.AreEqual(true, TestMatch.IsAllMatch(pattern, "color", "colour"));
+            Assert.AreEqual(true, TestMatch.IsAllNotMatch(pattern, "coluur"));
         }
 
-        //match로 매칭결과를 상세히 볼 수 있다. 단 여러개 매칭하지는 못함.
+        [Test]
+        public void u가하나이상있을것()
+        {
+            var pattern = @"colou+r";
+            Assert.AreEqual(true, TestMatch.IsAllMatch(pattern, "colour", "colouur"));
+            Assert.AreEqual(true, TestMatch.IsAllNotMatch(pattern, "colr"));
+        }
+
+        [Test]
+        public void u가하나만있을것()
+        {
+            var pattern = @"colou{1}r";
+            Assert.AreEqual(true, TestMatch.IsAllMatch(pattern, "colour"));
+            Assert.AreEqual(true, TestMatch.IsAllNotMatch(pattern, "colr", "colouur"));
+        }
+
+        [Test]
+        public void u가있거나없거나()
+        {
+            var pattern = @"colou*r";
+            Assert.AreEqual(true, TestMatch.IsAllMatch(pattern, "colour", "color", "colouur"));
+        }
+
+        [Test]
+        public void 게으르게하기()
+        {
+            var pattern = @"\d.*?\d";
+            Assert.AreEqual("1aa1", Regex.Match("1aa1 1bb1", pattern).Value);
+        }
+    }
+
+    public class 문자집합
+    {
+        [Test]
+        public void 숫자를뽑아내기()
+        {
+            var pattern = @"\d\d";
+            Assert.AreEqual("11", Regex.Match("11aa", pattern).Value);
+            Assert.AreEqual("11", Regex.Match("aa11", pattern).Value);
+            Assert.AreEqual("11", Regex.Match("a11aa", pattern).Value);
+            Assert.AreEqual("11", Regex.Match("a111aa", pattern).Value);
+        }
+
+        [Test]
+        public void 글자를뽑아내기()
+        {
+            var pattern = @"\w\w";
+            Assert.AreEqual("11", Regex.Match("11aa", pattern).Value);
+            Assert.AreEqual("aa", Regex.Match("aa11", pattern).Value);
+            Assert.AreEqual("a1", Regex.Match("a11aa", pattern).Value);
+            Assert.AreEqual("a1", Regex.Match("a111aa", pattern).Value);
+        }
+
+        
+        [Test]
+        public void 알파벳만뽑아내기()
+        {
+            var pattern = @"\D\D";
+            Assert.AreEqual("aa", Regex.Match("11aa", pattern).Value);
+            Assert.AreEqual("aa", Regex.Match("aa11", pattern).Value);
+            Assert.AreEqual("aa", Regex.Match("a11aa", pattern).Value);
+            Assert.AreEqual("aa", Regex.Match("a111aa", pattern).Value);
+        }
+
+        [Test]
+        public void 띄어쓰기를_로교체할것()
+        {
+            var pattern = @"\s";
+            Assert.AreEqual("1_1", Regex.Replace("1 1", pattern, "_"));
+        }
+        
+    }
+
+    public class 치환그룹
+    {
+
+    }
+
+    public class 너비0단언
+    {
+        [Test]
+        public void 시작지점에서부터()
+        {
+            var pattern = @"";
+            Assert.AreEqual("aa", Regex.Match("aa", pattern).Value);
+        }
+
+        [Test]
+        public void 끝에서부터()
+        {
+            var pattern = @"";
+            Assert.AreEqual("bb", Regex.Match("aabb", pattern).Value);
+        }
+        [Test]
+        public void 단어경계로()
+        {
+            var pattern = @"";
+            Assert.AreEqual(3, Regex.Matches("aa bb cc", pattern).Count);
+        }
+        [Test]
+        public void 양성전방탐색()
+        {
+        }
+        [Test]
+        public void 음성전방탐색()
+        {
+        }
+        [Test]
+        public void 양성후방탐색()
+        {
+        }
+        [Test]
+        public void 음성후방탐색()
+        {
+        }
+
+    }
+
+public static class TestMatch
+    {
+        public static bool IsAllMatch(string pattern, params string[] strs)
+        {
+            return strs.All(s => Regex.IsMatch(s, pattern));
+        }
+
+        public static bool IsAllNotMatch(string pattern, params string[] strs)
+        {
+            return strs.All(s => !Regex.IsMatch(s, pattern));
+        }
+
+
+    }
+
+    public class Study{
+
+    //match로 매칭결과를 상세히 볼 수 있다. 단 여러개 매칭하지는 못함.
         [Test]
         public void Match_ReturnResultObject()
         {
@@ -277,12 +407,12 @@ namespace Study
             //1. (?=) 로 조건을 지정했다. "숫자가 1개 이상 있을 것" 
             //2. 그 조건을 만족했다면, 만족한 곳으로 돌아가서 "길이가 6이상인지 체크" 한다.
             //todo : 이 예제에서 헷갈리는 것은 '만족한 곳으로 돌아간다' 인데. 그게 어딘지 정확히 모르겠다.
-            var regex = @"(?=.*\d).{6,}";  
-            Assert.AreEqual(true, Regex.IsMatch("abcde1", regex));
-            Assert.AreEqual(false, Regex.IsMatch("ABCD1", regex)); // 길이가 모자람
-            Assert.AreEqual(true, Regex.IsMatch("ABCDEF11", regex));//길이가 넘치는 건 괜찮음.
-            Assert.AreEqual(false, Regex.IsMatch("ABCDEF", regex));//숫자가 하나는 있어야 함
-            Assert.AreEqual(true, Regex.IsMatch("1234567", regex)); //숫자만으로 되어도 문제없다.
+            var pattern = @"(?=.*\d).{6,}";  
+            Assert.AreEqual(true, Regex.IsMatch("abcde1", pattern));
+            Assert.AreEqual(false, Regex.IsMatch("ABCD1", pattern)); // 길이가 모자람
+            Assert.AreEqual(true, Regex.IsMatch("ABCDEF11", pattern));//길이가 넘치는 건 괜찮음.
+            Assert.AreEqual(false, Regex.IsMatch("ABCDEF", pattern));//숫자가 하나는 있어야 함
+            Assert.AreEqual(true, Regex.IsMatch("1234567", pattern)); //숫자만으로 되어도 문제없다.
 
             
         }
@@ -296,15 +426,15 @@ namespace Study
             //이후의 텍스트가 정규식과 부합하지 않아야 만족함.
             //Q: good 을 가지되, 그 다음에 but 이나 however 가 없을 것
             //대소문자 구분을 하지 않을 것.
-            var regex = @"(?i)good(?!.*(however|but))"; 
-            Assert.AreEqual(true, Regex.IsMatch("good", regex));
-            Assert.AreEqual(true, Regex.IsMatch("Good", regex));
-            Assert.AreEqual(false, Regex.IsMatch("good. but...", regex));
-            Assert.AreEqual(false, Regex.IsMatch("good. But...", regex));
-            Assert.AreEqual(false, Regex.IsMatch("good. and But...", regex));
-            Assert.AreEqual(false, Regex.IsMatch("good. however...", regex));
-            Assert.AreEqual(false, Regex.IsMatch("good. However...", regex));
-            Assert.AreEqual(false, Regex.IsMatch("good. and so However...", regex));
+            var pattern = @"(?i)good(?!.*(however|but))"; 
+            Assert.AreEqual(true, Regex.IsMatch("good", pattern));
+            Assert.AreEqual(true, Regex.IsMatch("Good", pattern));
+            Assert.AreEqual(false, Regex.IsMatch("good. but...", pattern));
+            Assert.AreEqual(false, Regex.IsMatch("good. But...", pattern));
+            Assert.AreEqual(false, Regex.IsMatch("good. and But...", pattern));
+            Assert.AreEqual(false, Regex.IsMatch("good. however...", pattern));
+            Assert.AreEqual(false, Regex.IsMatch("good. However...", pattern));
+            Assert.AreEqual(false, Regex.IsMatch("good. and so However...", pattern));
 
             //Q : 그 역을 구하시오. good을 포함하되, 뒤에 but이나 however 가 따라와야 성립하도록 할 것. 대소문자 무시할 것.
             var antiRegex = @"(?i)good(?=.*(but|however))";
@@ -319,10 +449,10 @@ namespace Study
             //(?<=정규식)
             //양성 후방탐색
             //부합위치 이전의 텍스트가 정규식과 부합해야 함. 
-            var regex = @"(?i)(?<=however.*)good"; //대소문자 무시하고, however 가 앞에 있어야 한다.
-            Assert.AreEqual(false, Regex.IsMatch("very good", regex));
-            Assert.AreEqual(true, Regex.IsMatch("However good", regex));
-            Assert.AreEqual(true, Regex.IsMatch("However and good", regex));
+            var pattern = @"(?i)(?<=however.*)good"; //대소문자 무시하고, however 가 앞에 있어야 한다.
+            Assert.AreEqual(false, Regex.IsMatch("very good", pattern));
+            Assert.AreEqual(true, Regex.IsMatch("However good", pattern));
+            Assert.AreEqual(true, Regex.IsMatch("However and good", pattern));
         }
 
         [Test]
@@ -331,10 +461,10 @@ namespace Study
             //(?<!정규식)
             //음성 후방탐색
             //부합위치 이전의 텍스트사 정규식과 부합하지 않아야 함.
-            var regex = @"(?i)(?<!however.*)good"; //대소문자 무시하고, however 가 앞에 없어야 함. however 뒤에 .*는 그 사이에 글자가 몇개 있을 수도 있다는 것.
-            Assert.AreEqual(true,  Regex.IsMatch("very good", regex)); 
-            Assert.AreEqual(false,  Regex.IsMatch("However good", regex));
-            Assert.AreEqual(false,  Regex.IsMatch("However and good", regex)); //however 뒤에 .*이 붙었으므로, good 과 however 사이에 무엇이 있든 상관없음.
+            var pattern = @"(?i)(?<!however.*)good"; //대소문자 무시하고, however 가 앞에 없어야 함. however 뒤에 .*는 그 사이에 글자가 몇개 있을 수도 있다는 것.
+            Assert.AreEqual(true,  Regex.IsMatch("very good", pattern)); 
+            Assert.AreEqual(false,  Regex.IsMatch("However good", pattern));
+            Assert.AreEqual(false,  Regex.IsMatch("However and good", pattern)); //however 뒤에 .*이 붙었으므로, good 과 however 사이에 무엇이 있든 상관없음.
 
         }
         #endregion
@@ -359,10 +489,10 @@ namespace Study
         [Test]
         public void ByWord()
         {
-            var regex = @"\b\w+\b";
-            Assert.AreEqual(3, Regex.Matches("aa bb cc", regex).Count);
-            Assert.AreEqual(3, Regex.Matches("aa bbb cc", regex).Count);
-            Assert.AreEqual(4, Regex.Matches("aa bb1 ccc 1", regex).Count);
+            var pattern = @"\b\w+\b";
+            Assert.AreEqual(3, Regex.Matches("aa bb cc", pattern).Count);
+            Assert.AreEqual(3, Regex.Matches("aa bbb cc", pattern).Count);
+            Assert.AreEqual(4, Regex.Matches("aa bb1 ccc 1", pattern).Count);
 
             //단어단위로 끊지 않으므로, 2개 선택됨 (in, in)
             Assert.AreEqual(2, Regex.Matches("in inout", @"in").Count);
