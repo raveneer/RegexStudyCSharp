@@ -97,42 +97,108 @@ namespace Study
         [Test]
         public void 시작지점에서부터()
         {
-            var pattern = @"";
+            var pattern = @"^..";
             Assert.AreEqual("aa", Regex.Match("aa", pattern).Value);
+            Assert.AreEqual("aa", Regex.Match("aaa", pattern).Value);
+            Assert.AreEqual("aa", Regex.Match("aaaa", pattern).Value);
         }
 
         [Test]
         public void 끝에서부터()
         {
-            var pattern = @"";
+            var pattern = @"..$";
             Assert.AreEqual("bb", Regex.Match("aabb", pattern).Value);
+            Assert.AreEqual("bb", Regex.Match("aaccbb", pattern).Value);
+            Assert.AreEqual("bb", Regex.Match("aacbb", pattern).Value);
         }
         [Test]
         public void 단어경계로()
         {
-            var pattern = @"";
+            //여기서 .을 쓰지 않는 것에 주의. 헷갈림.
+            var pattern = @"\b\w+\b";
             Assert.AreEqual(3, Regex.Matches("aa bb cc", pattern).Count);
         }
+
         [Test]
         public void 양성전방탐색()
         {
+            //상당히 헷갈리는 것인데, consume 과 not consume 을 생각하면 좋다.
+            //또한 '전방탐색' 이라고 하지만 실제로는 앞에 것을 검출해낸다는 것도 헷갈림. (그래서 전방탐색이라고 하는 걸까...)
+            //보통 이렇게 해서 :까지 찾을 수 있지만...
+            var pattern2 = @".+:";
+            Assert.AreEqual("http:", Regex.Match("http://www.forta.com", pattern2).Value);
+            Assert.AreEqual("https:", Regex.Match("https://www.forta.com", pattern2).Value);
+            Assert.AreEqual("ftp:", Regex.Match("ftp://www.forta.com", pattern2).Value);
+
+            //양성전방탐색을 씀으로, 해당 부분을 찾되 '포함하지 않을 수' 있다.
+            var pattern = @".+(?=:)";
+            Assert.AreEqual("http", Regex.Match("http://www.forta.com", pattern).Value);
+            Assert.AreEqual("https", Regex.Match("https://www.forta.com", pattern).Value);
+            Assert.AreEqual("ftp", Regex.Match("ftp://www.forta.com", pattern).Value);
         }
+
         [Test]
         public void 음성전방탐색()
         {
+            //양성과 반대다. 주의할 점. 여러글자를 체크하므로, 앞글자에서 걸릴수도 있고 그렇다...
+            var pattern = @"\d*(?!:)";
+            Assert.AreEqual("5", Regex.Match("5/", pattern).Value);
+            Assert.AreEqual("", Regex.Match("1:", pattern).Value);
+            Assert.AreEqual("", Regex.Match("3:", pattern).Value);
         }
+
         [Test]
         public void 양성후방탐색()
         {
+            //후방탐색은 조건식 이후를 찾아낸다. (이쪽이 좀 더 이해하기 쉽다...)
+            var pattern = @"(?<=:).*";
+            Assert.AreEqual("10", Regex.Match("http:10", pattern).Value);
+            Assert.AreEqual("20", Regex.Match("https:20", pattern).Value);
+            Assert.AreEqual("30 40 50", Regex.Match("ftp:30 40 50", pattern).Value);
         }
+
         [Test]
         public void 음성후방탐색()
-        {
+        { 
+            var pattern = @"(?<!:)\d\d";
+            //2자릿수의 숫자일 것. 앞에 : 가 '없을 것' (역시 후방탐색이 이해하기 쉽다)
+            Assert.AreEqual("20", Regex.Match("http:10 20", pattern).Value); 
         }
 
     }
 
-public static class TestMatch
+    public class 분할
+    {
+        //Regex.Split 이용해서 string.Split 보다 강력한 교체가 가능하다.
+        [Test]
+        public void 강력하다()
+        {
+            var pattern = @"\d";
+            Assert.AreEqual("aa", Regex.Split("aa1bb2cc", pattern)[0]);
+            Assert.AreEqual("bb", Regex.Split("aa1bb2cc", pattern)[1]);
+            Assert.AreEqual("cc", Regex.Split("aa1bb2cc", pattern)[2]);
+
+            //나눌때 조건 사이에 정보가 없으면 ""로 나눠지는 것에 주의할 것.
+            Assert.AreEqual("aa", Regex.Split("aa11bb22cc", pattern)[0]);
+            Assert.AreEqual("", Regex.Split("aa11bb22cc", pattern)[1]);
+            Assert.AreEqual("bb", Regex.Split("aa11bb22cc", pattern)[2]);
+            Assert.AreEqual("", Regex.Split("aa11bb22cc", pattern)[3]);
+            Assert.AreEqual("cc", Regex.Split("aa11bb22cc", pattern)[4]);
+        }
+    }
+
+    public class 치환
+    {
+        [Test]
+        public void 강력하다()
+        {
+            var pattern = @"\d";
+            Assert.AreEqual("aaAbbAcc", Regex.Replace("aa1bb2cc", pattern,"A"));
+        }
+    }
+    
+
+    public static class TestMatch
     {
         public static bool IsAllMatch(string pattern, params string[] strs)
         {
@@ -143,8 +209,24 @@ public static class TestMatch
         {
             return strs.All(s => !Regex.IsMatch(s, pattern));
         }
+    }
+
+    public class 그루핑
+    {
+        [Test]
+        public void 그룹으로뽑아낼수있다()
+        {
+            //주의! group[0]은 항상 정규식 매칭 '전체'를 반환한다!
+            //따라서 각각의 그룹은 1부터 시작할 것.
+            var pattern = @"(\d{3})-(\d{3}-\d{4})";
+            Assert.AreEqual("123", Regex.Match("123-456-7890", pattern).Groups[1].Value);
+            Assert.AreEqual("456-7890", Regex.Match("123-456-7890", pattern).Groups[2].Value);
+
+            Assert.AreEqual("111", Regex.Match("111-222-3333", pattern).Groups[1].Value);
+            Assert.AreEqual("222-3333", Regex.Match("111-222-3333", pattern).Groups[2].Value);
 
 
+        }
     }
 
     public class Study{
