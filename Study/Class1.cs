@@ -9,7 +9,7 @@ namespace Study
         [Test]
         public void u가0또는1있기()
         {
-            var pattern = @"colou?r";
+            var pattern = @"";
             Assert.AreEqual(true, TestMatch.IsAllMatch(pattern, "color", "colour"));
             Assert.AreEqual(true, TestMatch.IsAllNotMatch(pattern, "coluur"));
         }
@@ -17,7 +17,7 @@ namespace Study
         [Test]
         public void u가하나이상있을것()
         {
-            var pattern = @"colou+r";
+            var pattern = @"";
             Assert.AreEqual(true, TestMatch.IsAllMatch(pattern, "colour", "colouur"));
             Assert.AreEqual(true, TestMatch.IsAllNotMatch(pattern, "colr"));
         }
@@ -25,7 +25,7 @@ namespace Study
         [Test]
         public void u가하나만있을것()
         {
-            var pattern = @"colou{1}r";
+            var pattern = @"";
             Assert.AreEqual(true, TestMatch.IsAllMatch(pattern, "colour"));
             Assert.AreEqual(true, TestMatch.IsAllNotMatch(pattern, "colr", "colouur"));
         }
@@ -33,14 +33,14 @@ namespace Study
         [Test]
         public void u가있거나없거나()
         {
-            var pattern = @"colou*r";
+            var pattern = @"";
             Assert.AreEqual(true, TestMatch.IsAllMatch(pattern, "colour", "color", "colouur"));
         }
 
         [Test]
         public void 게으르게하기()
         {
-            var pattern = @"\d.*?\d";
+            var pattern = @"";
             Assert.AreEqual("1aa1", Regex.Match("1aa1 1bb1", pattern).Value);
         }
     }
@@ -50,7 +50,7 @@ namespace Study
         [Test]
         public void 숫자를뽑아내기()
         {
-            var pattern = @"\d\d";
+            var pattern = @"";
             Assert.AreEqual("11", Regex.Match("11aa", pattern).Value);
             Assert.AreEqual("11", Regex.Match("aa11", pattern).Value);
             Assert.AreEqual("11", Regex.Match("a11aa", pattern).Value);
@@ -60,7 +60,7 @@ namespace Study
         [Test]
         public void 글자를뽑아내기()
         {
-            var pattern = @"\w\w";
+            var pattern = @"";
             Assert.AreEqual("11", Regex.Match("11aa", pattern).Value);
             Assert.AreEqual("aa", Regex.Match("aa11", pattern).Value);
             Assert.AreEqual("a1", Regex.Match("a11aa", pattern).Value);
@@ -71,7 +71,7 @@ namespace Study
         [Test]
         public void 알파벳만뽑아내기()
         {
-            var pattern = @"\D\D";
+            var pattern = @"";
             Assert.AreEqual("aa", Regex.Match("11aa", pattern).Value);
             Assert.AreEqual("aa", Regex.Match("aa11", pattern).Value);
             Assert.AreEqual("aa", Regex.Match("a11aa", pattern).Value);
@@ -81,7 +81,7 @@ namespace Study
         [Test]
         public void 띄어쓰기를_로교체할것()
         {
-            var pattern = @"\s";
+            var pattern = @"";
             Assert.AreEqual("1_1", Regex.Replace("1 1", pattern, "_"));
         }
         
@@ -97,7 +97,7 @@ namespace Study
         [Test]
         public void 시작지점에서부터()
         {
-            var pattern = @"^..";
+            var pattern = @"";
             Assert.AreEqual("aa", Regex.Match("aa", pattern).Value);
             Assert.AreEqual("aa", Regex.Match("aaa", pattern).Value);
             Assert.AreEqual("aa", Regex.Match("aaaa", pattern).Value);
@@ -106,7 +106,7 @@ namespace Study
         [Test]
         public void 끝에서부터()
         {
-            var pattern = @"..$";
+            var pattern = @"";
             Assert.AreEqual("bb", Regex.Match("aabb", pattern).Value);
             Assert.AreEqual("bb", Regex.Match("aaccbb", pattern).Value);
             Assert.AreEqual("bb", Regex.Match("aacbb", pattern).Value);
@@ -115,7 +115,7 @@ namespace Study
         public void 단어경계로()
         {
             //여기서 .을 쓰지 않는 것에 주의. 헷갈림.
-            var pattern = @"\b\w+\b";
+            var pattern = @"";
             Assert.AreEqual(3, Regex.Matches("aa bb cc", pattern).Count);
         }
 
@@ -125,13 +125,13 @@ namespace Study
             //상당히 헷갈리는 것인데, consume 과 not consume 을 생각하면 좋다.
             //또한 '전방탐색' 이라고 하지만 실제로는 앞에 것을 검출해낸다는 것도 헷갈림. (그래서 전방탐색이라고 하는 걸까...)
             //보통 이렇게 해서 :까지 찾을 수 있지만...
-            var pattern2 = @".+:";
+            var pattern2 = @"";
             Assert.AreEqual("http:", Regex.Match("http://www.forta.com", pattern2).Value);
             Assert.AreEqual("https:", Regex.Match("https://www.forta.com", pattern2).Value);
             Assert.AreEqual("ftp:", Regex.Match("ftp://www.forta.com", pattern2).Value);
 
             //양성전방탐색을 씀으로, 해당 부분을 찾되 '포함하지 않을 수' 있다.
-            var pattern = @".+(?=:)";
+            var pattern = @"";
             Assert.AreEqual("http", Regex.Match("http://www.forta.com", pattern).Value);
             Assert.AreEqual("https", Regex.Match("https://www.forta.com", pattern).Value);
             Assert.AreEqual("ftp", Regex.Match("ftp://www.forta.com", pattern).Value);
@@ -141,7 +141,7 @@ namespace Study
         public void 음성전방탐색()
         {
             //양성과 반대다. 주의할 점. 여러글자를 체크하므로, 앞글자에서 걸릴수도 있고 그렇다...
-            var pattern = @"\d*(?!:)";
+            var pattern = @"";
             Assert.AreEqual("5", Regex.Match("5/", pattern).Value);
             Assert.AreEqual("", Regex.Match("1:", pattern).Value);
             Assert.AreEqual("", Regex.Match("3:", pattern).Value);
@@ -151,7 +151,7 @@ namespace Study
         public void 양성후방탐색()
         {
             //후방탐색은 조건식 이후를 찾아낸다. (이쪽이 좀 더 이해하기 쉽다...)
-            var pattern = @"(?<=:).*";
+            var pattern = @"";
             Assert.AreEqual("10", Regex.Match("http:10", pattern).Value);
             Assert.AreEqual("20", Regex.Match("https:20", pattern).Value);
             Assert.AreEqual("30 40 50", Regex.Match("ftp:30 40 50", pattern).Value);
@@ -160,7 +160,7 @@ namespace Study
         [Test]
         public void 음성후방탐색()
         { 
-            var pattern = @"(?<!:)\d\d";
+            var pattern = @"";
             //2자릿수의 숫자일 것. 앞에 : 가 '없을 것' (역시 후방탐색이 이해하기 쉽다)
             Assert.AreEqual("20", Regex.Match("http:10 20", pattern).Value); 
         }
@@ -173,7 +173,7 @@ namespace Study
         [Test]
         public void 강력하다()
         {
-            var pattern = @"\d";
+            var pattern = @"";
             Assert.AreEqual("aa", Regex.Split("aa1bb2cc", pattern)[0]);
             Assert.AreEqual("bb", Regex.Split("aa1bb2cc", pattern)[1]);
             Assert.AreEqual("cc", Regex.Split("aa1bb2cc", pattern)[2]);
@@ -192,7 +192,7 @@ namespace Study
         [Test]
         public void 강력하다()
         {
-            var pattern = @"\d";
+            var pattern = @"";
             Assert.AreEqual("aaAbbAcc", Regex.Replace("aa1bb2cc", pattern,"A"));
         }
     }
@@ -218,7 +218,7 @@ namespace Study
         {
             //주의! group[0]은 항상 정규식 매칭 '전체'를 반환한다!
             //따라서 각각의 그룹은 1부터 시작할 것.
-            var pattern = @"(\d{3})-(\d{3}-\d{4})";
+            var pattern = @"";
             Assert.AreEqual("123", Regex.Match("123-456-7890", pattern).Groups[1].Value);
             Assert.AreEqual("456-7890", Regex.Match("123-456-7890", pattern).Groups[2].Value);
 
@@ -235,7 +235,7 @@ namespace Study
         [Test]
         public void Match_ReturnResultObject()
         {
-            var m = Regex.Match("i have color and colour", @"color");
+            var m = Regex.Match("i have color and colour", @"");
             Assert.True(m.Success);
             Assert.AreEqual(7, m.Index); //처음으로 매칭된 인덱스를 반환.
             Assert.AreEqual(5, m.Length); //매칭된 길이 반환.
@@ -246,7 +246,7 @@ namespace Study
         [Test]
         public void Matches_ReturnResultObjects()
         {
-            var ms = Regex.Matches("i have color and colour", @"colou?r");
+            var ms = Regex.Matches("i have color and colour", @"");
             Assert.AreEqual(2, ms.Count); // 당연히 2개 들어있겠지?
             Assert.AreEqual("color", ms[0].Value);
             Assert.AreEqual("colour", ms[1].Value);
@@ -256,7 +256,7 @@ namespace Study
         [Test]
         public void NextMatch_ReturnResultObject()
         {
-            var m = Regex.Match("i have color and colour", @"colou?r");
+            var m = Regex.Match("i have color and colour", @"");
             var nextM = m.NextMatch();
             Assert.True(nextM.Success);
             Assert.AreEqual(17, nextM.Index); //처음으로 매칭된 인덱스를 반환.
@@ -269,7 +269,7 @@ namespace Study
         [Test]
         public void UseOf_Or()
         {
-            var ms = Regex.Matches("i have color and colour", @"col(o|ou)r");
+            var ms = Regex.Matches("i have color and colour", @"");
             Assert.AreEqual("color", ms[0].Value);
             Assert.AreEqual("colour", ms[1].Value);
         }
@@ -279,9 +279,9 @@ namespace Study
         [Test]
         public void CaseSensitive()
         {
-            Assert.AreEqual(false, Regex.IsMatch("A", @"a")); // 대소문자가 다르니까 안된다.
-            Assert.AreEqual(true, Regex.IsMatch("A", @"a", RegexOptions.IgnoreCase)); // 대소문자를 무시하고 찾을 수 있다.
-            var match = Regex.Match("A", @"a", RegexOptions.IgnoreCase);
+            Assert.AreEqual(false, Regex.IsMatch("A", @"")); // 대소문자가 다르니까 안된다.
+            Assert.AreEqual(true, Regex.IsMatch("A", @"", RegexOptions.IgnoreCase)); // 대소문자를 무시하고 찾을 수 있다.
+            var match = Regex.Match("A", @"", RegexOptions.IgnoreCase);
             Assert.AreEqual("A", match.Value); // 무시하고 찾았어도, 찾은 값 자체는 불변이다. (뭐 당연한 거긴 하지...)
         }
 
@@ -297,19 +297,19 @@ namespace Study
         [Test]
         public void CanBeShort_RegexOptions()
         {
-            Assert.AreEqual(true, Regex.IsMatch("A", @"(?i)a")); //대소문자 무시. Ignore
-            Assert.AreEqual(true, Regex.IsMatch("A", @"(?s)A")); // 한줄만. SingleLine
+            Assert.AreEqual(true, Regex.IsMatch("A", @"")); //대소문자 무시. Ignore
+            Assert.AreEqual(true, Regex.IsMatch("A", @"")); // 한줄만. SingleLine
 
-            Assert.AreEqual(true, Regex.IsMatch("A", @"(?m)A")); // 멀티라인. MultiLine
-            Assert.AreEqual(true, Regex.IsMatch("B\r\nA", @"(?m)A")); // 멀티라인과 싱글라인 차이를 잘 모르겠네...
-            Assert.AreEqual(true, Regex.IsMatch("BA", @"(?i)ba")); 
+            Assert.AreEqual(true, Regex.IsMatch("A", @"")); // 멀티라인. MultiLine
+            Assert.AreEqual(true, Regex.IsMatch("B\r\nA", @"")); // 멀티라인과 싱글라인 차이를 잘 모르겠네...
+            Assert.AreEqual(true, Regex.IsMatch("BA", @"")); 
 
             //멀티라인과 싱글라인이 정확히 뭘 하는건지 모르겠다. 차차 알게 되겠지...
             Assert.AreEqual(true, Regex.IsMatch("B\r\nA", @"")); // 싱글라인에서도 줄바꿈후의 A를 잘 찾고...
 
             //문자열의 끝에서부터 역으로 검색할 수도 있다. 그렇다고 해서 문자열이 뒤집히는 것은 아니다. 단지 우선순위를 뒤에 준다는 것 뿐임. 
             //문자열을 '뒤집지 않는다' 라는 점이 의외로 좋은 해결책일 수도 있다. 왜냐면 문자열 자체를 뒤집으면 찾는 문자도 뒤집혀야 하기 때문이다. 
-            Assert.AreEqual("3", Regex.Match("123", @"\d", RegexOptions.RightToLeft).Value);
+            Assert.AreEqual("3", Regex.Match("123", @"", RegexOptions.RightToLeft).Value);
         }
 
         /*
@@ -358,58 +358,58 @@ namespace Study
         [Test]
         public void Test_문자집합()
         {
-            Assert.AreEqual(true, Regex.IsMatch("that", @"[tT]hat"));
-            Assert.AreEqual(true, Regex.IsMatch("That", @"[tT]hat"));
+            Assert.AreEqual(true, Regex.IsMatch("that", @""));
+            Assert.AreEqual(true, Regex.IsMatch("That", @""));
 
             // ? 와 다른 점은, ?는 있어도 없어도 되지만 []는 반드시 있어야 함.
-            Assert.AreEqual(false, Regex.IsMatch("hat", @"[tT]hat"));
+            Assert.AreEqual(false, Regex.IsMatch("hat", @""));
 
             //범위지정 가능
-            Assert.AreEqual(true, Regex.IsMatch("1", @"[0-1]"));
+            Assert.AreEqual(true, Regex.IsMatch("1", @""));
 
             //숫자는 숫자로 처리도 가능.
-            Assert.AreEqual(true, Regex.IsMatch("1", @"\d"));
+            Assert.AreEqual(true, Regex.IsMatch("1", @""));
             //두자릿수의 숫자라면 이렇게도 가능. 
-            Assert.AreEqual(true, Regex.IsMatch("11", @"\d\d"));
-            Assert.AreEqual(true, Regex.IsMatch("00", @"\d\d"));
-            Assert.AreEqual(true, Regex.IsMatch("99", @"\d\d"));
-            Assert.AreEqual(false, Regex.IsMatch("1", @"\d\d"));
+            Assert.AreEqual(true, Regex.IsMatch("11", @""));
+            Assert.AreEqual(true, Regex.IsMatch("00", @""));
+            Assert.AreEqual(true, Regex.IsMatch("99", @""));
+            Assert.AreEqual(false, Regex.IsMatch("1", @""));
         }
 
         [Test]
         public void CheckKorean()
         {
             //한'글자' 만 받아내라.
-            Assert.AreEqual("철", Regex.Match("철수", @"\w").Value);
-            Assert.AreEqual("ㅊ", Regex.Match("ㅊㅋ", @"\w").Value);
+            Assert.AreEqual("철", Regex.Match("철수", @"").Value);
+            Assert.AreEqual("ㅊ", Regex.Match("ㅊㅋ", @"").Value);
 
             //한글만 받아내기. 상용구니까 외워버려라. (단 아래 정규식들은 1글자 만 판정하고 있음을 잊지말것)
-            Assert.AreEqual(true, Regex.IsMatch("ㅊㅋ", @"[ㄱ-ㅎㅏ-ㅣ가-힣]"));
-            Assert.AreEqual(true, Regex.IsMatch("ㅗㅜㅑ", @"[ㄱ-ㅎㅏ-ㅣ가-힣]"));
-            Assert.AreEqual(true, Regex.IsMatch("철수", @"[ㄱ-ㅎㅏ-ㅣ가-힣]"));
+            Assert.AreEqual(true, Regex.IsMatch("ㅊㅋ", @""));
+            Assert.AreEqual(true, Regex.IsMatch("ㅗㅜㅑ", @""));
+            Assert.AreEqual(true, Regex.IsMatch("철수", @""));
         }
 
         [Test]
         public void CheckSpace()
         {
             //빈칸일 것
-            Assert.AreEqual(true, Regex.IsMatch(" ", @"\s"));
-            Assert.AreEqual(false, Regex.IsMatch("a", @"\s"));
+            Assert.AreEqual(true, Regex.IsMatch(" ", @""));
+            Assert.AreEqual(false, Regex.IsMatch("a", @""));
 
             //빈칸일것의 역. 대문자가 된다.
-            Assert.AreEqual(false, Regex.IsMatch(" ", @"\S"));
-            Assert.AreEqual(true, Regex.IsMatch("a", @"\S"));
+            Assert.AreEqual(false, Regex.IsMatch(" ", @""));
+            Assert.AreEqual(true, Regex.IsMatch("a", @""));
         }
 
         [Test]
         public void Check_Digit()
         {
-            Assert.AreEqual(true, Regex.IsMatch("1", @"\d"));
-            Assert.AreEqual(false, Regex.IsMatch("a", @"\d"));
+            Assert.AreEqual(true, Regex.IsMatch("1", @""));
+            Assert.AreEqual(false, Regex.IsMatch("a", @""));
 
             //역은 대문자.
-            Assert.AreEqual(false, Regex.IsMatch("1", @"\D"));
-            Assert.AreEqual(true, Regex.IsMatch("a", @"\D"));
+            Assert.AreEqual(false, Regex.IsMatch("1", @""));
+            Assert.AreEqual(true, Regex.IsMatch("a", @""));
         }
 
         #endregion
@@ -428,14 +428,14 @@ namespace Study
         [Test]
         public void Check_Count()
         {
-            Assert.AreEqual("123", Regex.Match("123", @"123").Value);
+            Assert.AreEqual("123", Regex.Match("123", @"").Value);
 
-            Assert.AreEqual("12345", Regex.Match("12345", @"\d*5").Value); //숫자를 1개이상 가지고, 5로 끝나는 것
+            Assert.AreEqual("12345", Regex.Match("12345", @"").Value); //숫자를 1개이상 가지고, 5로 끝나는 것
 
-            Assert.AreEqual("45", Regex.Match("12345", @"\d5").Value); // 숫자를 하나만 가지고, 5로 끝나는 것은 "45"
+            Assert.AreEqual("45", Regex.Match("12345", @""));
             
-            Assert.AreEqual(2, Regex.Matches("12345 23456", @"\d+5").Count); // 숫자를 1개 이상 가지고, 5로 끝나는 것은 12345, 2345 2가지 있다.
-            Assert.AreEqual(3, Regex.Matches("12345 23456 5", @"\d?5").Count); // 숫자를 0 또는 1개 가지는 것. 12345, 2345, 5 3가지 있다.
+            Assert.AreEqual(2, Regex.Matches("12345 23456", @"").Count); // 숫자를 1개 이상 가지고, 5로 끝나는 것은 12345, 2345 2가지 있다.
+            Assert.AreEqual(3, Regex.Matches("12345 23456 5", @"").Count); // 숫자를 0 또는 1개 가지는 것. 12345, 2345, 5 3가지 있다.
         }
 
 
@@ -445,14 +445,14 @@ namespace Study
             //뒤에 ? 붙이는 걸로 한정사가 첫번째 매치만 찾도록 할 수 있다.
             
             //A와 A 사이에 아무 문자라도 있거나 없거나 하면 됨. (탐욕적)
-            Assert.AreEqual("ABABA", Regex.Match("ABABA", @"A.*A").Value); 
+            Assert.AreEqual("ABABA", Regex.Match("ABABA", @"").Value); 
             
             //A와 A 사이에 아무 문자라도 있거나 없거나 할 것. (게으른)
-            Assert.AreEqual("ABA", Regex.Match("ABABA", @"A.*?A").Value);
+            Assert.AreEqual("ABA", Regex.Match("ABABA", @"").Value);
 
             //위 경우는 당연히 여러개의 답이 존재하게 된다. 단, 겹치지는 않음에 주의할 것.
-            Assert.AreEqual(2, Regex.Matches("ABAABA", @"A.*?A").Count); // 이 경우 2개의 답이 되지만...
-            Assert.AreEqual(1, Regex.Matches("ABABA", @"A.*?A").Count); //이 경우 1개의 답이 되버린다. 중앙의 A가 겹치지 않기 때문에.
+            Assert.AreEqual(2, Regex.Matches("ABAABA", @"").Count); // 이 경우 2개의 답이 되지만...
+            Assert.AreEqual(1, Regex.Matches("ABABA", @"").Count); //이 경우 1개의 답이 되버린다. 중앙의 A가 겹치지 않기 때문에.
 
         }
         #endregion
@@ -475,13 +475,13 @@ namespace Study
         {
             //miles가 뒤따라 오는 숫자를 구하기.
             //(단 이 경우 예제의 명확함을 위해 /s가 앞에 나온것에 주의)
-            Assert.AreEqual("25 ", Regex.Match("say 25 miles more", @"\d+\s(?=miles)").Value);
+            Assert.AreEqual("25 ", Regex.Match("say 25 miles more", @"").Value);
             //순수히 숫자만 구하겠다면...\s 를 안으로 집어넣어야 하는데, 이러면 꼭 smiles 처럼 보인단 말이지...
-            Assert.AreEqual("25", Regex.Match("say 25 miles more", @"\d+(?=\smiles)").Value);
+            Assert.AreEqual("25", Regex.Match("say 25 miles more", @"").Value);
             //이렇게 조건을 만족하지 않는다면 검출되지 않는다. (mile 과 meter 는 다르니까)
-            Assert.AreEqual("", Regex.Match("say 25 meter more", @"\d+(?=\smiles)").Value);
+            Assert.AreEqual("", Regex.Match("say 25 meter more", @"").Value);
             //단지 조건일 뿐이므로, 이런 식으로 그 이후를 받아내는 것도 가능하다. (뒤에 .*를 넣어 끝까지 뽑아냈음) -> 관용구라 할 만 하네.
-            Assert.AreEqual("25 miles more", Regex.Match("say 25 miles more", @"\d+(?=\smiles).*").Value);
+            Assert.AreEqual("25 miles more", Regex.Match("say 25 miles more", @"").Value);
 
             //강한 패스워드 규칙을 정할때 자주 쓰게 된다 (관용구)
             //적어도 6자 여야 하며, 숫자가 적어도 하나는 있어야 한다고 하자.
@@ -489,7 +489,7 @@ namespace Study
             //1. (?=) 로 조건을 지정했다. "숫자가 1개 이상 있을 것" 
             //2. 그 조건을 만족했다면, 만족한 곳으로 돌아가서 "길이가 6이상인지 체크" 한다.
             //todo : 이 예제에서 헷갈리는 것은 '만족한 곳으로 돌아간다' 인데. 그게 어딘지 정확히 모르겠다.
-            var pattern = @"(?=.*\d).{6,}";  
+            var pattern = @"";  
             Assert.AreEqual(true, Regex.IsMatch("abcde1", pattern));
             Assert.AreEqual(false, Regex.IsMatch("ABCD1", pattern)); // 길이가 모자람
             Assert.AreEqual(true, Regex.IsMatch("ABCDEF11", pattern));//길이가 넘치는 건 괜찮음.
@@ -508,7 +508,7 @@ namespace Study
             //이후의 텍스트가 정규식과 부합하지 않아야 만족함.
             //Q: good 을 가지되, 그 다음에 but 이나 however 가 없을 것
             //대소문자 구분을 하지 않을 것.
-            var pattern = @"(?i)good(?!.*(however|but))"; 
+            var pattern = @""; 
             Assert.AreEqual(true, Regex.IsMatch("good", pattern));
             Assert.AreEqual(true, Regex.IsMatch("Good", pattern));
             Assert.AreEqual(false, Regex.IsMatch("good. but...", pattern));
@@ -519,7 +519,7 @@ namespace Study
             Assert.AreEqual(false, Regex.IsMatch("good. and so However...", pattern));
 
             //Q : 그 역을 구하시오. good을 포함하되, 뒤에 but이나 however 가 따라와야 성립하도록 할 것. 대소문자 무시할 것.
-            var antiRegex = @"(?i)good(?=.*(but|however))";
+            var antiRegex = @"";
             Assert.AreEqual(false, Regex.IsMatch("good", antiRegex));
             Assert.AreEqual(true, Regex.IsMatch("good. but...", antiRegex));
         }
@@ -531,7 +531,7 @@ namespace Study
             //(?<=정규식)
             //양성 후방탐색
             //부합위치 이전의 텍스트가 정규식과 부합해야 함. 
-            var pattern = @"(?i)(?<=however.*)good"; //대소문자 무시하고, however 가 앞에 있어야 한다.
+            var pattern = @""; //대소문자 무시하고, however 가 앞에 있어야 한다.
             Assert.AreEqual(false, Regex.IsMatch("very good", pattern));
             Assert.AreEqual(true, Regex.IsMatch("However good", pattern));
             Assert.AreEqual(true, Regex.IsMatch("However and good", pattern));
@@ -543,7 +543,7 @@ namespace Study
             //(?<!정규식)
             //음성 후방탐색
             //부합위치 이전의 텍스트사 정규식과 부합하지 않아야 함.
-            var pattern = @"(?i)(?<!however.*)good"; //대소문자 무시하고, however 가 앞에 없어야 함. however 뒤에 .*는 그 사이에 글자가 몇개 있을 수도 있다는 것.
+            var pattern = @""; //대소문자 무시하고, however 가 앞에 없어야 함. however 뒤에 .*는 그 사이에 글자가 몇개 있을 수도 있다는 것.
             Assert.AreEqual(true,  Regex.IsMatch("very good", pattern)); 
             Assert.AreEqual(false,  Regex.IsMatch("However good", pattern));
             Assert.AreEqual(false,  Regex.IsMatch("However and good", pattern)); //however 뒤에 .*이 붙었으므로, good 과 however 사이에 무엇이 있든 상관없음.
@@ -560,27 +560,27 @@ namespace Study
         public void Anchor_MeansPlace_NotWord()
         {
             //위치만 지정하고 글자 자체는 받아내지 못한다... 그럼 이거 왜 쓰는거야?
-            Assert.AreEqual("", Regex.Match("a", @"^").Value);
-            Assert.AreEqual("", Regex.Match("a", @"$").Value);
+            Assert.AreEqual("", Regex.Match("a", @"").Value);
+            Assert.AreEqual("", Regex.Match("a", @"").Value);
 
             //이래도 빈칸임. 즉 위치정보만 가지고 값 정보는 없다고 볼 수 있다. (애매하네용)000
-            Assert.AreEqual("", Regex.Match("aa", @"^").Value);
-            Assert.AreEqual("", Regex.Match("aa", @"$").Value);
+            Assert.AreEqual("", Regex.Match("aa", @"").Value);
+            Assert.AreEqual("", Regex.Match("aa", @"").Value);
         }
 
         [Test]
         public void ByWord()
         {
-            var pattern = @"\b\w+\b";
+            var pattern = @"";
             Assert.AreEqual(3, Regex.Matches("aa bb cc", pattern).Count);
             Assert.AreEqual(3, Regex.Matches("aa bbb cc", pattern).Count);
             Assert.AreEqual(4, Regex.Matches("aa bb1 ccc 1", pattern).Count);
 
             //단어단위로 끊지 않으므로, 2개 선택됨 (in, in)
-            Assert.AreEqual(2, Regex.Matches("in inout", @"in").Count);
+            Assert.AreEqual(2, Regex.Matches("in inout", @"").Count);
             //단어단위로 끊으니까 앞의 in 만 선택됨
-            Assert.AreEqual(1, Regex.Matches("in inout", @"\bin\b").Count);
-            Assert.AreEqual("in", Regex.Match("in inout", @"\bin\b").Value);
+            Assert.AreEqual(1, Regex.Matches("in inout", @"").Count);
+            Assert.AreEqual("in", Regex.Match("in inout", @"").Value);
 
         }
 
