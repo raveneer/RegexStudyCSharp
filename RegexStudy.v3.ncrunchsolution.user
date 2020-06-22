@@ -3,6 +3,6 @@
     <AutoEnable>True</AutoEnable>
     <CurrentEngineMode>Run all tests automatically [Global]</CurrentEngineMode>
     <StatusIndicatorSplitterDistance>84</StatusIndicatorSplitterDistance>
-    <TestsWindowSplitterDistance>251</TestsWindowSplitterDistance>
+    <TestsWindowSplitterDistance>268</TestsWindowSplitterDistance>
   </Settings>
 </SolutionConfiguration>
